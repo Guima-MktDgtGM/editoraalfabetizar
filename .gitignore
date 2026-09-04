@@ -1,0 +1,20 @@
+# Arte original do template concorrente — NUNCA publicar
+images/_backup-originais/
+
+# Originais pesados das imagens (17MB) — o site usa as versões comprimidas em images/
+Imagens novas/
+Imagens/
+
+# Backups do HTML
+index.html.bak*
+
+# Documentos de estratégia, prompts e pesquisa — uso interno
+*.md
+
+# Rascunho do ebook (produto, não faz parte do site)
+kit-destrava-leitura.html
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
