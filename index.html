@@ -370,6 +370,12 @@
   cursor:pointer; border-radius:50%; font-family:inherit;
 }
 #social-proof .sp-x:hover{background:#f4f1f2; color:#7a7a7a}
+#social-proof .sp-optout{
+  background:none; border:0; padding:0; margin:0; font-family:inherit;
+  font-size:10px; color:#b3adb0; text-decoration:underline; cursor:pointer; white-space:nowrap;
+}
+#social-proof .sp-optout:hover{color:#FF5D87}
+#social-proof .sp-l2{flex-wrap:wrap; row-gap:1px}
 @media (max-width:420px){
   #social-proof{left:10px; bottom:10px; padding:9px 30px 9px 10px; border-radius:14px}
   #social-proof .sp-ico{flex-basis:30px; width:30px; height:30px; font-size:15px}
@@ -387,7 +393,7 @@
   <div class="sp-ico">🎉</div>
   <div class="sp-txt">
     <div class="sp-l1" id="sp-l1"></div>
-    <div class="sp-l2"><span class="sp-dot"></span><span id="sp-l2"></span></div>
+    <div class="sp-l2"><span class="sp-dot"></span><span id="sp-l2"></span><button class="sp-optout" type="button" id="sp-optout">não mostrar mais</button></div>
   </div>
 </div>
 
@@ -442,7 +448,8 @@
   var pi = 0;
   function proxProduto(){ var p = sequenciaProduto[pi % sequenciaProduto.length]; pi++; return p; }
 
-  var mostradas = 0, timerFechar = null, fechadoPeloUsuario = false;
+  var mostradas = 0, timerFechar = null, desativado = false;
+  try { desativado = sessionStorage.getItem('sp_off') === '1'; } catch(e){}
 
   function esconder(){
     el.classList.remove('sp-on');
@@ -450,7 +457,7 @@
   }
 
   function mostrar(){
-    if(fechadoPeloUsuario || mostradas >= MAX_TOTAL) return;
+    if(desativado || mostradas >= MAX_TOTAL) return;
     /* nao concorre com o pop-up de upgrade */
     var modal = document.getElementById('modal-upgrade');
     if(modal && modal.classList.contains('is-open')){ agendar(); return; }
@@ -471,13 +478,22 @@
   }
 
   function agendar(){
-    if(fechadoPeloUsuario || mostradas >= MAX_TOTAL) return;
+    if(desativado || mostradas >= MAX_TOTAL) return;
     var gap = GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN);
     setTimeout(mostrar, gap);
   }
 
+  /* X: dispensa apenas esta notificacao — as proximas continuam */
   el.querySelector('.sp-x').addEventListener('click', function(){
-    fechadoPeloUsuario = true;   /* fechou uma vez, nao insiste mais */
+    clearTimeout(timerFechar);
+    esconder();
+    agendar();
+  });
+
+  /* "nao mostrar mais": encerra de vez nesta sessao */
+  document.getElementById('sp-optout').addEventListener('click', function(){
+    desativado = true;
+    try { sessionStorage.setItem('sp_off','1'); } catch(e){}
     clearTimeout(timerFechar);
     esconder();
   });
